@@ -54,6 +54,8 @@ class HTTPChannel(wasyncore.dispatcher):
     #
 
     def __init__(self, server, sock, addr, adj, map=None):
+        """"""
+        
         self.server = server
         self.adj = adj
         self.outbufs = [OverflowableBuffer(adj.outbuf_overflow)]
@@ -82,6 +84,8 @@ class HTTPChannel(wasyncore.dispatcher):
         return not self.connected
 
     def writable(self):
+        """"""
+        
         # if there's data in the out buffer or we've been instructed to close
         # the channel (possibly by our server maintenance logic), run
         # handle_write
@@ -89,6 +93,8 @@ class HTTPChannel(wasyncore.dispatcher):
         return self.total_outbufs_len or self.will_close or self.close_when_flushed
 
     def handle_write(self):
+        """"""
+        
         # Precondition: there's data in the out buffer to be sent, or
         # there's a pending will_close request
 
@@ -127,6 +133,8 @@ class HTTPChannel(wasyncore.dispatcher):
             self.handle_close()
 
     def _flush_exception(self, flush, do_close=True):
+        """"""
+        
         if flush:
             try:
                 return (flush(do_close=do_close), False)
@@ -143,6 +151,8 @@ class HTTPChannel(wasyncore.dispatcher):
                 return (False, True)
 
     def readable(self):
+        """"""
+        
         # We might want to read more requests. We can only do this if:
         # 1. We're not already about to close the connection.
         # 2. We're not waiting to flush remaining data before closing the
@@ -159,6 +169,8 @@ class HTTPChannel(wasyncore.dispatcher):
         )
 
     def handle_read(self):
+        """"""
+        
         try:
             data = self.recv(self.adj.recv_bytes)
         except OSError:
@@ -241,6 +253,8 @@ class HTTPChannel(wasyncore.dispatcher):
         return True
 
     def _flush_some_if_lockable(self, do_close=True):
+        """"""
+        
         # Since our task may be appending to the outbuf, we try to acquire
         # the lock, but we don't block if we can't.
 
@@ -254,6 +268,8 @@ class HTTPChannel(wasyncore.dispatcher):
                 self.outbuf_lock.release()
 
     def _flush_some(self, do_close=True):
+        """"""
+        
         # Send as much data as possible to our client
 
         sent = 0
@@ -302,6 +318,8 @@ class HTTPChannel(wasyncore.dispatcher):
         return False
 
     def handle_close(self):
+        """"""
+        
         with self.outbuf_lock:
             for outbuf in self.outbufs:
                 try:
@@ -340,6 +358,8 @@ class HTTPChannel(wasyncore.dispatcher):
     #
 
     def write_soon(self, data):
+        """"""
+        
         if not self.connected:
             # if the socket is closed then interrupt the task so that it
             # can cleanup possibly before the app_iter is exhausted
@@ -389,6 +409,8 @@ class HTTPChannel(wasyncore.dispatcher):
         return 0
 
     def _flush_outbufs_below_high_watermark(self):
+        """"""
+        
         # check first to avoid locking if possible
 
         if self.total_outbufs_len > self.adj.outbuf_high_watermark:

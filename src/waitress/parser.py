@@ -34,6 +34,8 @@ from waitress.utilities import (
 
 
 def unquote_bytes_to_wsgi(bytestring):
+    """"""
+    
     return unquote_to_bytes(bytestring).decode("latin-1")
 
 
@@ -328,6 +330,8 @@ class HTTPRequestParser:
                 self.body_rcv = FixedStreamReceiver(cl, buf)
 
     def get_body_stream(self):
+        """"""
+        
 
         if (body_rcv := self.body_rcv) is not None:
             return body_rcv.getfile()
@@ -335,12 +339,16 @@ class HTTPRequestParser:
             return BytesIO()
 
     def close(self):
+        """"""
+        
 
         if (body_rcv := self.body_rcv) is not None:
             body_rcv.getbuf().close()
 
 
 def split_uri(uri):
+    """"""
+    
     # urlsplit handles byte input by returning bytes on py3, so
     # scheme, netloc, path, query, and fragment are bytes
 
@@ -411,6 +419,8 @@ first_line_re = re.compile(
 
 
 def crack_first_line(line):
+    """"""
+    
     m = first_line_re.match(line)
 
     if m is not None and m.end() == len(line):

@@ -27,6 +27,8 @@ class FileBasedBuffer:
     remain = 0
 
     def __init__(self, file, from_buffer=None):
+        """"""
+        
         self.file = file
         if from_buffer is not None:
             from_file = from_buffer.getfile()
@@ -42,12 +44,18 @@ class FileBasedBuffer:
             file.seek(read_pos)
 
     def __len__(self):
+        """"""
+        
         return self.remain
 
     def __bool__(self):
+        """"""
+        
         return True
 
     def append(self, s):
+        """"""
+        
         file = self.file
         read_pos = file.tell()
         file.seek(0, 2)
@@ -56,6 +64,8 @@ class FileBasedBuffer:
         self.remain = self.remain + len(s)
 
     def get(self, numbytes=-1, skip=False):
+        """"""
+        
         file = self.file
         if not skip:
             read_pos = file.tell()
@@ -71,6 +81,8 @@ class FileBasedBuffer:
         return res
 
     def skip(self, numbytes, allow_prune=0):
+        """"""
+        
         if self.remain < numbytes:
             raise ValueError(
                 "Can't skip %d bytes in buffer of %d bytes" % (numbytes, self.remain)
@@ -79,9 +91,13 @@ class FileBasedBuffer:
         self.remain = self.remain - numbytes
 
     def newfile(self):
+        """"""
+        
         raise NotImplementedError()
 
     def prune(self):
+        """"""
+        
         file = self.file
         if self.remain == 0:
             read_pos = file.tell()
@@ -100,9 +116,13 @@ class FileBasedBuffer:
         self.file = nf
 
     def getfile(self):
+        """"""
+        
         return self.file
 
     def close(self):
+        """"""
+        
         if hasattr(self.file, "close"):
             self.file.close()
         self.remain = 0
@@ -110,9 +130,13 @@ class FileBasedBuffer:
 
 class TempfileBasedBuffer(FileBasedBuffer):
     def __init__(self, from_buffer=None):
+        """"""
+        
         FileBasedBuffer.__init__(self, self.newfile(), from_buffer)
 
     def newfile(self):
+        """"""
+        
         from tempfile import TemporaryFile
 
         return TemporaryFile("w+b")
@@ -120,6 +144,8 @@ class TempfileBasedBuffer(FileBasedBuffer):
 
 class BytesIOBasedBuffer(FileBasedBuffer):
     def __init__(self, from_buffer=None):
+        """"""
+        
         if from_buffer is not None:
             FileBasedBuffer.__init__(self, BytesIO(), from_buffer)
         else:
@@ -127,10 +153,14 @@ class BytesIOBasedBuffer(FileBasedBuffer):
             self.file = BytesIO()
 
     def newfile(self):
+        """"""
+        
         return BytesIO()
 
 
 def _is_seekable(fp):
+    """"""
+    
     if hasattr(fp, "seekable"):
         return fp.seekable()
     return hasattr(fp, "seek") and hasattr(fp, "tell")
@@ -140,6 +170,8 @@ class ReadOnlyFileBasedBuffer(FileBasedBuffer):
     # used as wsgi.file_wrapper
 
     def __init__(self, file, block_size=32768):
+        """"""
+        
         self.file = file
         self.block_size = block_size  # for __iter__
 
@@ -154,6 +186,8 @@ class ReadOnlyFileBasedBuffer(FileBasedBuffer):
             self.tell = self.file.tell
 
     def prepare(self, size=None):
+        """"""
+        
         if _is_seekable(self.file):
             start_pos = self.file.tell()
             self.file.seek(0, 2)
@@ -167,6 +201,8 @@ class ReadOnlyFileBasedBuffer(FileBasedBuffer):
         return self.remain
 
     def get(self, numbytes=-1, skip=False):
+        """"""
+        
         # never read more than self.remain (it can be user-specified)
         if numbytes == -1 or numbytes > self.remain:
             numbytes = self.remain
@@ -181,9 +217,21 @@ class ReadOnlyFileBasedBuffer(FileBasedBuffer):
         return res
 
     def __iter__(self):  # called by task if self.filelike has no seek/tell
+        """Returns an iterator object for the given filelike object.
+        Parameters:
+            - self (filelike object): The filelike object to be iterated over.
+        Returns:
+            - iterator object: An iterator object for the given filelike object.
+        Processing Logic:
+            - Return iterator object for filelike object.
+            - Called by task if no seek/tell.
+            - Only used if self.filelike has no seek/tell."""
+        
         return self
 
     def next(self):
+        """"""
+        
         val = self.file.read(self.block_size)
         if not val:
             raise StopIteration

@@ -49,6 +49,8 @@ class ThreadedTaskDispatcher:
     queue_logger = queue_logger
 
     def __init__(self):
+        """"""
+        
         self.threads = set()
         self.queue = deque()
         self.lock = threading.Lock()
@@ -56,6 +58,8 @@ class ThreadedTaskDispatcher:
         self.thread_exit_cv = threading.Condition(self.lock)
 
     def start_new_thread(self, target, thread_no):
+        """"""
+        
         t = threading.Thread(
             target=target, name=f"waitress-{thread_no}", args=(thread_no,)
         )
@@ -63,6 +67,8 @@ class ThreadedTaskDispatcher:
         t.start()
 
     def handler_thread(self, thread_no):
+        """"""
+        
         while True:
             with self.lock:
                 while not self.queue and self.stop_count == 0:
@@ -86,6 +92,8 @@ class ThreadedTaskDispatcher:
                 self.logger.exception("Exception when servicing %r", task)
 
     def set_thread_count(self, count):
+        """"""
+        
         with self.lock:
             threads = self.threads
             thread_no = 0
@@ -105,6 +113,8 @@ class ThreadedTaskDispatcher:
                 self.queue_cv.notify_all()
 
     def add_task(self, task):
+        """"""
+        
         with self.lock:
             self.queue.append(task)
             self.queue_cv.notify()
@@ -116,6 +126,8 @@ class ThreadedTaskDispatcher:
                 )
 
     def shutdown(self, cancel_pending=True, timeout=5):
+        """"""
+        
         self.set_thread_count(0)
         # Ensure the threads shut down.
         threads = self.threads
@@ -153,6 +165,8 @@ class Task:
     logger = logger
 
     def __init__(self, channel, request):
+        """"""
+        
         self.channel = channel
         self.request = request
         self.response_headers = []
@@ -163,6 +177,8 @@ class Task:
         self.version = version
 
     def service(self):
+        """"""
+        
         try:
             self.start()
             self.execute()
@@ -174,6 +190,8 @@ class Task:
 
     @property
     def has_body(self):
+        """"""
+        
         return not (
             self.status.startswith("1")
             or self.status.startswith("204")
@@ -181,6 +199,8 @@ class Task:
         )
 
     def build_response_header(self):
+        """"""
+        
         version = self.version
         # Figure out whether the connection should be closed.
         connection = self.request.headers.get("CONNECTION", "").lower()
@@ -278,6 +298,8 @@ class Task:
         return res.encode("latin-1")
 
     def remove_content_length_header(self):
+        """"""
+        
         response_headers = []
 
         for header_name, header_value in self.response_headers:
@@ -288,9 +310,13 @@ class Task:
         self.response_headers = response_headers
 
     def start(self):
+        """"""
+        
         self.start_time = time.time()
 
     def finish(self):
+        """"""
+        
         if not self.wrote_header:
             self.write(b"")
         if self.chunked_response:
@@ -298,6 +324,8 @@ class Task:
             self.channel.write_soon(b"0\r\n\r\n")
 
     def write(self, data):
+        """"""
+        
         if not self.complete:
             raise RuntimeError("start_response was not called before body written")
         channel = self.channel
@@ -344,6 +372,8 @@ class ErrorTask(Task):
     complete = True
 
     def execute(self):
+        """"""
+        
         ident = self.channel.server.adj.ident
         e = self.request.error
         status, headers, body = e.to_response(ident)
@@ -364,6 +394,8 @@ class WSGITask(Task):
     environ = None
 
     def execute(self):
+        """"""
+        
         environ = self.get_environment()
 
         def start_response(status, headers, exc_info=None):

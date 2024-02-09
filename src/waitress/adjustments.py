@@ -47,6 +47,8 @@ def asoctal(s):
 
 
 def aslist_cronly(value):
+    """"""
+    
     if isinstance(value, str):
         value = filter(None, [x.strip() for x in value.splitlines()])
     return list(value)
@@ -65,10 +67,14 @@ def aslist(value):
 
 
 def asset(value):
+    """"""
+    
     return set(aslist(value))
 
 
 def slash_fixed_str(s):
+    """"""
+    
     if s := s.strip():
         # always have a leading slash, replace any number of leading slashes
         # with a single slash, and strip any trailing slashes
@@ -77,6 +83,8 @@ def slash_fixed_str(s):
 
 
 def str_iftruthy(s):
+    """"""
+    
     return str(s) if s else None
 
 
@@ -289,6 +297,8 @@ class Adjustments:
     server_name = "waitress.invalid"
 
     def __init__(self, **kw):
+        """"""
+        
 
         if "listen" in kw and ("host" in kw or "port" in kw):
             raise ValueError("host or port may not be set if listen is set.")
@@ -485,6 +495,8 @@ class Adjustments:
 
     @classmethod
     def check_sockets(cls, sockets):
+        """"""
+        
         has_unix_socket = False
         has_inet_socket = False
         has_unsupported_socket = False
