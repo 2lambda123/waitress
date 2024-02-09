@@ -69,8 +69,7 @@ def asset(value):
 
 
 def slash_fixed_str(s):
-    s = s.strip()
-    if s:
+    if s := s.strip():
         # always have a leading slash, replace any number of leading slashes
         # with a single slash, and strip any trailing slashes
         s = "/" + s.lstrip("/").rstrip("/")
@@ -467,9 +466,8 @@ class Adjustments:
 
         opts, args = getopt.getopt(argv, "", long_opts)
         for opt, value in opts:
-            param = opt.lstrip("-").replace("-", "_")
 
-            if param == "listen":
+            if (param := opt.lstrip("-").replace("-", "_")) == "listen":
                 kw["listen"] = "{} {}".format(kw.get("listen", ""), value)
                 continue
 

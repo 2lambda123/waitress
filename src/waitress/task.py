@@ -191,9 +191,8 @@ class Task:
         connection_close_header = None
 
         for (headername, headerval) in self.response_headers:
-            headername = "-".join([x.capitalize() for x in headername.split("-")])
 
-            if headername == "Content-Length":
+            if (headername := "-".join([x.capitalize() for x in headername.split("-")])) == "Content-Length":
                 if self.has_body:
                     content_length_header = headerval
                 else:
@@ -417,8 +416,7 @@ class WSGITask(Task):
                         "carriage return/line feed character present in header name"
                     )
 
-                kl = k.lower()
-                if kl == "content-length":
+                if (kl := k.lower()) == "content-length":
                     self.content_length = int(v)
                 elif kl in hop_by_hop:
                     raise AssertionError(
@@ -472,8 +470,7 @@ class WSGITask(Task):
                 if chunk:
                     self.write(chunk)
 
-            cl = self.content_length
-            if cl is not None:
+            if (cl := self.content_length) is not None:
                 if self.content_bytes_written != cl:
                     # close the connection so the client isn't sitting around
                     # waiting for more data when there are too few bytes
@@ -491,8 +488,7 @@ class WSGITask(Task):
 
     def get_environment(self):
         """Returns a WSGI environment."""
-        environ = self.environ
-        if environ is not None:
+        if (environ := self.environ) is not None:
             # Return the cached copy.
             return environ
 
@@ -556,8 +552,7 @@ class WSGITask(Task):
 
         for key, value in dict(request.headers).items():
             value = value.strip()
-            mykey = rename_headers.get(key, None)
-            if mykey is None:
+            if (mykey := rename_headers.get(key, None)) is None:
                 mykey = "HTTP_" + key
             if mykey not in environ:
                 environ[mykey] = value

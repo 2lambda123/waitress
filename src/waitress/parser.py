@@ -89,9 +89,8 @@ class HTTPRequestParser:
             return 0  # Can't consume any more.
 
         datalen = len(data)
-        br = self.body_rcv
 
-        if br is None:
+        if (br := self.body_rcv) is None:
             # In header.
             max_header = self.adj.max_request_header_size
 
@@ -329,17 +328,15 @@ class HTTPRequestParser:
                 self.body_rcv = FixedStreamReceiver(cl, buf)
 
     def get_body_stream(self):
-        body_rcv = self.body_rcv
 
-        if body_rcv is not None:
+        if (body_rcv := self.body_rcv) is not None:
             return body_rcv.getfile()
         else:
             return BytesIO()
 
     def close(self):
-        body_rcv = self.body_rcv
 
-        if body_rcv is not None:
+        if (body_rcv := self.body_rcv) is not None:
             body_rcv.getbuf().close()
 
 

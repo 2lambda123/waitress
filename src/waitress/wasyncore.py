@@ -498,8 +498,7 @@ class dispatcher:
             self.handle_read()
 
     def handle_connect_event(self):
-        err = self.socket.getsockopt(socket.SOL_SOCKET, socket.SO_ERROR)
-        if err != 0:
+        if (err := self.socket.getsockopt(socket.SOL_SOCKET, socket.SO_ERROR)) != 0:
             raise OSError(err, _strerror(err))
         self.handle_connect()
         self.connected = True
@@ -520,8 +519,7 @@ class dispatcher:
         # handle_expt_event() is called if there might be an error on the
         # socket, or if there is OOB data
         # check for the error condition first
-        err = self.socket.getsockopt(socket.SOL_SOCKET, socket.SO_ERROR)
-        if err != 0:
+        if (err := self.socket.getsockopt(socket.SOL_SOCKET, socket.SO_ERROR)) != 0:
             # we can get here when select.select() says that there is an
             # exceptional condition on the socket
             # since there is an error, we'll go ahead and close the socket
@@ -560,8 +558,7 @@ class dispatcher:
         self.log_info("unhandled connect event", "warning")
 
     def handle_accept(self):
-        pair = self.accept()
-        if pair is not None:
+        if (pair := self.accept()) is not None:
             self.handle_accepted(*pair)
 
     def handle_accepted(self, sock, addr):

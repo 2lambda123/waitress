@@ -214,8 +214,7 @@ class OverflowableBuffer:
         self.overflow = overflow
 
     def __len__(self):
-        buf = self.buf
-        if buf is not None:
+        if (buf := self.buf) is not None:
             # use buf.__len__ rather than len(buf) FBO of not getting
             # OverflowError on Python 2
             return buf.__len__()
@@ -260,8 +259,7 @@ class OverflowableBuffer:
         self.overflowed = True
 
     def append(self, s):
-        buf = self.buf
-        if buf is None:
+        if (buf := self.buf) is None:
             strbuf = self.strbuf
             if len(strbuf) + len(s) < STRBUF_LIMIT:
                 self.strbuf = strbuf + s
@@ -276,8 +274,7 @@ class OverflowableBuffer:
                 self._set_large_buffer()
 
     def get(self, numbytes=-1, skip=False):
-        buf = self.buf
-        if buf is None:
+        if (buf := self.buf) is None:
             strbuf = self.strbuf
             if not skip:
                 return strbuf
@@ -285,8 +282,7 @@ class OverflowableBuffer:
         return buf.get(numbytes, skip)
 
     def skip(self, numbytes, allow_prune=False):
-        buf = self.buf
-        if buf is None:
+        if (buf := self.buf) is None:
             if allow_prune and numbytes == len(self.strbuf):
                 # We could slice instead of converting to
                 # a buffer, but that would eat up memory in
@@ -301,8 +297,7 @@ class OverflowableBuffer:
         A potentially expensive operation that removes all data
         already retrieved from the buffer.
         """
-        buf = self.buf
-        if buf is None:
+        if (buf := self.buf) is None:
             self.strbuf = b""
             return
         buf.prune()
@@ -315,12 +310,10 @@ class OverflowableBuffer:
                 self._set_small_buffer()
 
     def getfile(self):
-        buf = self.buf
-        if buf is None:
+        if (buf := self.buf) is None:
             buf = self._create_buffer()
         return buf.getfile()
 
     def close(self):
-        buf = self.buf
-        if buf is not None:
+        if (buf := self.buf) is not None:
             buf.close()

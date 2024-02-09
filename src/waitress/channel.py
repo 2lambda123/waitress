@@ -267,9 +267,8 @@ class HTTPChannel(wasyncore.dispatcher):
 
             while outbuflen > 0:
                 chunk = outbuf.get(self.sendbuf_len)
-                num_sent = self.send(chunk, do_close=do_close)
 
-                if num_sent:
+                if num_sent := self.send(chunk, do_close=do_close):
                     outbuf.skip(num_sent, True)
                     outbuflen -= num_sent
                     sent += num_sent
