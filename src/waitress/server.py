@@ -51,8 +51,7 @@ def create_server(
     if map is None:  # pragma: nocover
         map = {}
 
-    dispatcher = _dispatcher
-    if dispatcher is None:
+    if (dispatcher := _dispatcher) is None:
         dispatcher = ThreadedTaskDispatcher()
         dispatcher.set_thread_count(adj.threads)
 
@@ -301,8 +300,7 @@ class BaseWSGIServer(wasyncore.dispatcher):
 
     def handle_accept(self):
         try:
-            v = self.accept()
-            if v is None:
+            if (v := self.accept()) is None:
                 return
             conn, addr = v
             self.set_socket_options(conn)
