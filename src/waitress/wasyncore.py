@@ -86,6 +86,8 @@ except NameError:
 
 
 def _strerror(err):
+    """"""
+    
     try:
         return os.strerror(err)
     except (TypeError, ValueError, OverflowError, NameError):
@@ -100,6 +102,8 @@ _reraised_exceptions = (ExitNow, KeyboardInterrupt, SystemExit)
 
 
 def read(obj):
+    """"""
+    
     try:
         obj.handle_read_event()
     except _reraised_exceptions:
@@ -109,6 +113,8 @@ def read(obj):
 
 
 def write(obj):
+    """"""
+    
     try:
         obj.handle_write_event()
     except _reraised_exceptions:
@@ -118,6 +124,8 @@ def write(obj):
 
 
 def _exception(obj):
+    """"""
+    
     try:
         obj.handle_expt_event()
     except _reraised_exceptions:
@@ -127,6 +135,8 @@ def _exception(obj):
 
 
 def readwrite(obj, flags):
+    """"""
+    
     try:
         if flags & select.POLLIN:
             obj.handle_read_event()
@@ -148,6 +158,8 @@ def readwrite(obj, flags):
 
 
 def poll(timeout=0.0, map=None):
+    """"""
+    
     if map is None:  # pragma: no cover
         map = socket_map
     if map:
@@ -196,6 +208,8 @@ def poll(timeout=0.0, map=None):
 
 
 def poll2(timeout=0.0, map=None):
+    """"""
+    
     # Use the poll() support added to the select module in Python 2.0
     if map is None:  # pragma: no cover
         map = socket_map
@@ -232,6 +246,8 @@ poll3 = poll2  # Alias for backward compatibility
 
 
 def loop(timeout=30.0, use_poll=False, map=None, count=None):
+    """"""
+    
     if map is None:  # pragma: no cover
         map = socket_map
 
@@ -251,6 +267,8 @@ def loop(timeout=30.0, use_poll=False, map=None, count=None):
 
 
 def compact_traceback():
+    """"""
+    
     t, v, tb = sys.exc_info()
     tbinfo = []
     if not tb:  # pragma: no cover
@@ -286,6 +304,8 @@ class dispatcher:
     compact_traceback = staticmethod(compact_traceback)  # for testing
 
     def __init__(self, sock=None, map=None):
+        """"""
+        
         if map is None:  # pragma: no cover
             self._map = socket_map
         else:
@@ -318,6 +338,8 @@ class dispatcher:
             self.socket = None
 
     def __repr__(self):
+        """"""
+        
         status = [self.__class__.__module__ + "." + self.__class__.__qualname__]
         if self.accepting and self.addr:
             status.append("listening")
@@ -333,12 +355,16 @@ class dispatcher:
     __str__ = __repr__
 
     def add_channel(self, map=None):
+        """"""
+        
         # self.log_info('adding channel %s' % self)
         if map is None:
             map = self._map
         map[self._fileno] = self
 
     def del_channel(self, map=None):
+        """"""
+        
         fd = self._fileno
         if map is None:
             map = self._map
@@ -348,17 +374,41 @@ class dispatcher:
         self._fileno = None
 
     def create_socket(self, family=socket.AF_INET, type=socket.SOCK_STREAM):
+        """Creates a socket with the specified family and type, sets it to non-blocking, and sets it as the socket for the current object.
+        Parameters:
+            - family (int): The address family for the socket. Defaults to AF_INET.
+            - type (int): The type of socket. Defaults to SOCK_STREAM.
+        Returns:
+            - socket: The created socket.
+        Processing Logic:
+            - Sets the family and type for the socket.
+            - Sets the socket to non-blocking.
+            - Sets the created socket as the socket for the current object."""
+        
         self.family_and_type = family, type
         sock = socket.socket(family, type)
         sock.setblocking(0)
         self.set_socket(sock)
 
     def set_socket(self, sock, map=None):
+        """"""
+        
         self.socket = sock
         self._fileno = sock.fileno()
         self.add_channel(map)
 
     def set_reuse_addr(self):
+        """Sets the server socket to reuse a port if possible.
+        Parameters:
+            - self (object): The server object.
+        Returns:
+            - None: No return value.
+        Processing Logic:
+            - Set server socket to reuse port.
+            - Use socket.setsockopt() method.
+            - Use socket.SOL_SOCKET and socket.SO_REUSEADDR constants.
+            - Use socket.getsockopt() method."""
+        
         # try to re-use a server port if possible
         try:
             self.socket.setsockopt(
@@ -376,9 +426,30 @@ class dispatcher:
     # ==================================================
 
     def readable(self):
+        """"This function checks if the input is readable or not."
+        Parameters:
+            - self (object): The input object to be checked for readability.
+        Returns:
+            - bool: True if the input is readable, False otherwise.
+        Processing Logic:
+            - Checks if the input is readable.
+            - Returns True if it is readable.
+            - Returns False if it is not readable."""
+        
         return True
 
     def writable(self):
+        """"Checks if the object is writable."
+        Parameters:
+            - self (object): The object to be checked.
+        Returns:
+            - bool: True if the object is writable, False otherwise.
+        Processing Logic:
+            - Checks if the object is writable.
+            - Returns a boolean value.
+            - No parameters are required.
+            - Can be used to determine if an object can be modified."""
+        
         return True
 
     # ==================================================
@@ -386,12 +457,35 @@ class dispatcher:
     # ==================================================
 
     def listen(self, num):
+        """Listen function to accept incoming connections.
+        Parameters:
+            - self (obj): The current object.
+            - num (int): The number of connections to accept.
+        Returns:
+            - socket: The socket object that listens for incoming connections.
+        Processing Logic:
+            - Set accepting to True.
+            - If the operating system is Windows and num is greater than 5, set num to 5.
+            - Return the socket object that listens for incoming connections.
+        Example:
+            listen(self, 10)  # Listens for 10 incoming connections."""
+        
         self.accepting = True
         if os.name == "nt" and num > 5:  # pragma: no cover
             num = 5
         return self.socket.listen(num)
 
     def bind(self, addr):
+        """"Bind the socket to a specific address."
+        Parameters:
+            - addr (str): The address to bind the socket to.
+        Returns:
+            - bool: True if the socket is successfully bound, False otherwise.
+        Processing Logic:
+            - Assign the given address to the socket.
+            - Call the bind method on the socket.
+            - Return the result of the bind method."""
+        
         self.addr = addr
         return self.socket.bind(addr)
 

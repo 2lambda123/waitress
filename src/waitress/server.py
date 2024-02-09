@@ -145,6 +145,8 @@ class MultiSocketServer:
         dispatcher=None,
         log_info=None,
     ):
+        """"""
+        
         self.adj = adj
         self.map = map
         self.effective_listen = effective_listen
@@ -152,6 +154,8 @@ class MultiSocketServer:
         self.log_info = log_info
 
     def print_listen(self, format_str):  # pragma: nocover
+        """"""
+        
         for l in self.effective_listen:
             l = list(l)
 
@@ -161,6 +165,8 @@ class MultiSocketServer:
             self.log_info(format_str.format(*l))
 
     def run(self):
+        """"""
+        
         try:
             self.asyncore.loop(
                 timeout=self.adj.asyncore_loop_timeout,
@@ -171,6 +177,8 @@ class MultiSocketServer:
             self.close()
 
     def close(self):
+        """"""
+        
         self.task_dispatcher.shutdown()
         wasyncore.close_all(self.map)
 
@@ -195,6 +203,8 @@ class BaseWSGIServer(wasyncore.dispatcher):
         bind_socket=True,
         **kw
     ):
+        """"""
+        
         if adj is None:
             adj = Adjustments(**kw)
 
@@ -249,19 +259,29 @@ class BaseWSGIServer(wasyncore.dispatcher):
             self.accept_connections()
 
     def bind_server_socket(self):
+        """"""
+        
         raise NotImplementedError  # pragma: no cover
 
     def getsockname(self):
+        """"""
+        
         raise NotImplementedError  # pragma: no cover
 
     def accept_connections(self):
+        """"""
+        
         self.accepting = True
         self.socket.listen(self.adj.backlog)  # Get around asyncore NT limit
 
     def add_task(self, task):
+        """"""
+        
         self.task_dispatcher.add_task(task)
 
     def readable(self):
+        """"""
+        
         now = time.time()
         if now >= self.next_channel_cleanup:
             self.next_channel_cleanup = now + self.adj.cleanup_interval
@@ -290,15 +310,23 @@ class BaseWSGIServer(wasyncore.dispatcher):
         return False
 
     def writable(self):
+        """"""
+        
         return False
 
     def handle_read(self):
+        """"""
+        
         pass
 
     def handle_connect(self):
+        """"""
+        
         pass
 
     def handle_accept(self):
+        """"""
+        
         try:
             if (v := self.accept()) is None:
                 return
@@ -320,6 +348,8 @@ class BaseWSGIServer(wasyncore.dispatcher):
         self.channel_class(self, conn, addr, self.adj, map=self._map)
 
     def run(self):
+        """"""
+        
         try:
             self.asyncore.loop(
                 timeout=self.adj.asyncore_loop_timeout,
@@ -330,12 +360,18 @@ class BaseWSGIServer(wasyncore.dispatcher):
             self.task_dispatcher.shutdown()
 
     def pull_trigger(self):
+        """"""
+        
         self.trigger.pull_trigger()
 
     def set_socket_options(self, conn):
+        """"""
+        
         pass
 
     def fix_addr(self, addr):
+        """"""
+        
         return addr
 
     def maintenance(self, now):
@@ -350,9 +386,13 @@ class BaseWSGIServer(wasyncore.dispatcher):
                 channel.will_close = True
 
     def print_listen(self, format_str):  # pragma: no cover
+        """"""
+        
         self.log_info(format_str.format(self.effective_host, self.effective_port))
 
     def close(self):
+        """"""
+        
         self.trigger.close()
         return wasyncore.dispatcher.close(self)
 
